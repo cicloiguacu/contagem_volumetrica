@@ -7,51 +7,61 @@ sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
 for(i in c(3,5,9,11,13,15)){
   
   # centro
-  dt <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[i],startRow=8)
-  dt[is.na(dt)] <- 0
-  dt$CAMINHAO_TOTAL <- dt$`CAMINHÃO.(2.EIXOS)`+dt$`CAMINHÃO.(+.2.EIXOS)`
-  tempo <- stringr::str_split_fixed(dt$`Período:.manhã`,"-",2)[,1] %>% 
+  dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[3],startRow=8)
+  dtcen[is.na(dtcen)] <- 0
+  dtcen <- setDT(dtcen)[,1:11]
+  #dtcen <- rbind(dtcen,data.table(c("total",colSums(dtcen[,2:11])))
+  dtcen[,vc_total := vc_masc + vc_fem + vc_nid]
+  dtcen[,cm_total := cm_masc + mc_fem + mc_nid]
+  dtcen[,can_total := can_masc + can_fem + can_nid]
+  dtcen[,BICI := vc_total + cm_total + can_total]
+  dtcen <- dtcen[,c("Período:.manhã","vc_total","cm_total","can_total","BICI")]
+  
+  tempo <- stringr::str_split_fixed(dtcen$`Período:.manhã`,"-",2)[,1] %>% 
     as.ITime() %>% as.POSIXct() %>% format("%H:%M")
-  nomes <- c("Bicicleta","Automóvel","Motocicleta","Ônibus","Caminhão","Outro")
-  dtcen <- data.table("time" = rep(tempo,6),
-                      "periodo" = rep(rep(c("Manhã","Tarde"),each=12),6),
-                      "veh" = rep(nomes,each=nrow(dt)),
-                      "total" = c(dt$BICI,dt$AUTO,dt$MOTO,dt$ÔNIBUS,dt$CAMINHAO_TOTAL,dt$OUTRO),
-                      "way" = "Centro")
+  nomes <- c("Via Calma","Contra-mão","Canaleta")
+  dtcen1 <- data.table("time" = rep(tempo,3),
+                       "periodo" = rep(rep(c("Manhã","Tarde"),each=12),3),
+                       "local" = rep(nomes,each=nrow(dtcen)),
+                       "total" = c(dtcen$vc_total,dtcen$cm_total,dtcen$can_total),
+                       "way" = "Centro")
   
-  # bairro
-  dt <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[i+1],startRow=8)
-  dt[is.na(dt)] <- 0
-  dt$CAMINHAO_TOTAL <- dt$`CAMINHÃO.(2.EIXOS)`+dt$`CAMINHÃO.(+.2.EIXOS)`
-  nomes <- c("Bicicleta","Automóvel","Motocicleta","Ônibus","Caminhão","Outro")
-  dtbai <- data.table("time" = rep(tempo,6),
-                      "periodo" = rep(rep(c("Manhã","Tarde"),each=12),6),
-                      "veh" = rep(nomes,each=nrow(dt)),
-                      "total" = c(dt$BICI,dt$AUTO,dt$MOTO,dt$ÔNIBUS,dt$CAMINHAO_TOTAL,dt$OUTRO),
-                      "way" = "Bairro");rm(dt)
-  dthour <- rbind(dtcen,dtbai)
+  # centro
+  dtbai <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[4],startRow=8)
+  dtbai[is.na(dtbai)] <- 0
+  dtbai <- setDT(dtbai)[,1:11]
+  #dtbai <- rbind(dtbai,data.table(c("total",colSums(dtbai[,2:11])))
+  dtbai[,vc_total := vc_masc + vc_fem + vc_nid]
+  dtbai[,cm_total := cm_masc + mc_fem + mc_nid]
+  dtbai[,can_total := can_masc + can_fem + can_nid]
+  dtbai[,BICI := vc_total + cm_total + can_total]
+  dtbai <- dtbai[,c("Período:.manhã","vc_total","cm_total","can_total","BICI")]
+  
+  dtbai1 <- data.table("time" = rep(tempo,3),
+                       "periodo" = rep(rep(c("Manhã","Tarde"),each=12),3),
+                       "local" = rep(nomes,each=nrow(dtbai)),
+                       "total" = c(dtbai$vc_total,dtbai$cm_total,dtbai$can_total),
+                       "way" = "Bairro")
   # ggplot hour
-  #dthour1 <- as.data.table(dtcen)[way %in% "Centro",]
-  #tempo1 <- tempo[1:12]
-  hour <- ggplot(dthour,aes(x=time,y=total,fill=veh))+
+  dthour <- rbind(dtcen1,dtbai1)
+  hour <- ggplot(dthour,aes(x=time,y=total,fill=local))+
     geom_bar(stat="identity")+ 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1,size=8),
-          legend.position = "none")+
-    labs(fill="Tipo de \n veículo")+
-    xlab(NULL)+ylab("Número de veículos")+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1,size=8),legend.position = "none")+
+    labs(fill="Local de \n circulação")+
+    xlab(NULL)+ylab("Número de bicicletas")+
     facet_grid(rows = vars(way),cols = vars(periodo),scales = "free_x")
-  
+
   # --
   # PIE
   # --
-  dtcenpie <- dtcen
-  dtcenpie <- as.data.table(dtcenpie)[,total := sum(total), by = veh][,.SD[1],by=veh][order(veh),]
+  dtcenpie <- dtcen1
+  dtcenpie <- as.data.table(dtcenpie)[,total := sum(total), by = local][,.SD[1],by=local][order(local),]
   dtcenpie <- dtcenpie[,total := 100 * total/sum(total)][,total := round(total,2)]
   dtcenpie[,ymax := cumsum(dtcenpie$total)][,ymin := c(0,head(ymax,-1))]
   dtcenpie[,pos := (ymax+ymin)/2]
   #
-  dtbaipie <- dtbai
-  dtbaipie <- as.data.table(dtbaipie)[,total := sum(total),by=veh][,.SD[1],by = veh][order(veh),]
+  dtbaipie <- dtbai1
+  dtbaipie <- as.data.table(dtbaipie)[,total := sum(total),by=local][,.SD[1],by = local][order(local),]
   dtbaipie <- dtbaipie[,total := 100 * total/sum(total)][,total := round(total,1)]
   dtbaipie[,ymax := cumsum(dtbaipie$total)][,ymin := c(0,head(ymax,-1))]
   dtbaipie[,pos := (ymax+ymin)/2]
@@ -61,9 +71,9 @@ for(i in c(3,5,9,11,13,15)){
   #dtpie <- dtpie[total>0,]
   #
   # ggplot pie
-  pos_label <- c(3.5,3.3,3.7,3.1,3.7,3.3) %>% 
+  pos_label <- c(3.5,3.5,3.5) %>% 
     rep(2)
-  pie <- ggplot(dtpie,aes(ymax= ymax, ymin=ymin, xmax=4, xmin=3,fill=veh))+
+  pie <- ggplot(dtpie,aes(ymax= ymax, ymin=ymin, xmax=4, xmin=3,fill=local))+
     geom_rect() +
     coord_polar(theta="y")+
     facet_grid(rows = vars(way))+
@@ -83,7 +93,7 @@ for(i in c(3,5,9,11,13,15)){
     labs(fill="Tipo de veículo")
   # multiplot
   pf <- grid.arrange(hour,pie,ncol=2)
-  ggsave(filename =paste0("graphics/total-flow_peak/",sname[i],".jpg"),plot = pf,
+  ggsave(filename =paste0("graphics/bici_flow_peak/",sname[i],".jpg"),plot = pf,
          width = 35,height = 15,units = "cm",dpi = "print")
   print(sname[i])
   
