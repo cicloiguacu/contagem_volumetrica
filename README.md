@@ -5,9 +5,11 @@ Scripts para analise de dados das contagens da Cicloiguacu, realizada em 2019. N
 
 Organizacao do repositorio:
 
-- `raw/2019/`: dados brutos por ano
-- `data/2019/`: dados tratados para serem lidos pelos scripts de plot
+- `data/2019/`: dados brutos por ano
+- `data_raw/2019/`: dados tratados para serem lidos pelos scripts de plot
 - `R/2019/`: codigos utilizados para plotar os graficos por ano
+- `graphics/total-flow_6to22/`: fluxo por veículos para pontos de contagem das 6-22h
+- `graphics/total-flow_peak/`: fluxo por veículos para pontos de contagem apenas nos horários de pico
 - `produtos/`: relatorio finais de contagem volumetrica
 
 
