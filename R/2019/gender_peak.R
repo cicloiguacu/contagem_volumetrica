@@ -6,7 +6,7 @@ library(gridExtra)
 library(data.table)
 library(dplyr)
 sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
-for(i in c(3,5,11,13,15)){ # 3,5,9,11,13,15
+for(i in c(3,5,9,11,13,15)){ # 3,5,9,11,13,15
   
   # centro
   dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[i],startRow=8)
@@ -43,7 +43,7 @@ for(i in c(3,5,11,13,15)){ # 3,5,9,11,13,15
     geom_bar(stat="identity")+
     geom_text(data=aux,aes(y=sum_unique,label=sum_unique),vjust=-0.5,
               colour = "grey58",size=3,fontface = "bold")+
-    ylim(0,max(dthour$total)*1.25)+
+    ylim(0,max(aux$sum_unique)*1.1)+
     theme(axis.text.x = element_text(angle = 45, hjust = 1,size=8),legend.position = "none")+
     labs(fill="Local de \n circulação")+
     xlab(NULL)+ylab("Número de bicicletas")+
