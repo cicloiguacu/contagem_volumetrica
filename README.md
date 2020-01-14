@@ -8,7 +8,7 @@ Organizacao do repositorio:
 - `data/2019/`: dados brutos por ano
 - `data_raw/2019/`: dados tratados para serem lidos pelos scripts de plot
 - `R/2019/`: codigos utilizados para plotar os graficos por ano
-
+- `produtos/`: relatorio finais de contagem volumetrica
 - **graphics/**
 - `total-flow_6to22/`: fluxo por *veículos* para pontos de contagem das 6-22h
 - `total-flow_peak/`: fluxo por *veículos* para pontos de contagem apenas nos horários de pico
@@ -17,7 +17,7 @@ Organizacao do repositorio:
 - `gender_flow_peak/`: fluxo por *bicicletas* por **genero** para pontos de contagem apenas nos horários de pico
 - `gender_flow_6to22/`: fluxo por *bicicletas* por **genero* para pontos de contagem das 6-22h
 
-- `produtos/`: relatorio finais de contagem volumetrica
+
 
 
 #### Creditos
