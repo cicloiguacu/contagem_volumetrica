@@ -15,7 +15,7 @@ Organizacao do repositorio:
 - `bici_flow_6to22/`: fluxo de *bicicletas* para pontos de contagem das 6-22h
 - `bici_flow_peak/`: fluxo por *bicicletas* para pontos de contagem apenas nos horários de pico
 - `gender_flow_peak/`: fluxo por *bicicletas* por **genero** para pontos de contagem apenas nos horários de pico
-- `gender_flow_6to22/`: fluxo por *bicicletas* por **genero* para pontos de contagem das 6-22h
+- `gender_flow_6to22/`: fluxo por *bicicletas* por **genero** para pontos de contagem das 6-22h
 
 
 
