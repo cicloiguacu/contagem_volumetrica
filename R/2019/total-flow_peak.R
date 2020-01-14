@@ -4,8 +4,7 @@ library(openxlsx)
 library(ggplot2)
 library(gridExtra)
 sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
-for(i in c(3,5,9,11,13,15)){
-  
+for(i in c(3,5,9,11,13,15)){ #
   # centro
   dt <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[i],startRow=8)
   dt[is.na(dt)] <- 0
@@ -33,20 +32,23 @@ for(i in c(3,5,9,11,13,15)){
   # ggplot hour
   #dthour1 <- as.data.table(dtcen)[way %in% "Centro",]
   #tempo1 <- tempo[1:12]
+  aux <- dthour[,unique := paste0(time,"_",periodo,"_",way)][,sum_unique := sum(total),by=unique][,.SD[1],by=unique]
   hour <- ggplot(dthour,aes(x=time,y=total,fill=veh))+
     geom_bar(stat="identity")+ 
+    geom_text(data=aux,aes(y=sum_unique,label=sum_unique),vjust=-0.5,
+              colour = "grey58",size=3,fontface = "bold")+
+    ylim(0,max(dthour$total)*1.6)+
     theme(axis.text.x = element_text(angle = 45, hjust = 1,size=8),
           legend.position = "none")+
     labs(fill="Tipo de \n veículo")+
     xlab(NULL)+ylab("Número de veículos")+
     facet_grid(rows = vars(way),cols = vars(periodo),scales = "free_x")
-  
   # --
   # PIE
   # --
   dtcenpie <- dtcen
   dtcenpie <- as.data.table(dtcenpie)[,total := sum(total), by = veh][,.SD[1],by=veh][order(veh),]
-  dtcenpie <- dtcenpie[,total := 100 * total/sum(total)][,total := round(total,2)]
+  dtcenpie <- dtcenpie[,total := 100 * total/sum(total)][,total := round(total,1)]
   dtcenpie[,ymax := cumsum(dtcenpie$total)][,ymin := c(0,head(ymax,-1))]
   dtcenpie[,pos := (ymax+ymin)/2]
   #
@@ -68,7 +70,7 @@ for(i in c(3,5,9,11,13,15)){
     coord_polar(theta="y")+
     facet_grid(rows = vars(way))+
     geom_label(x= pos_label,
-               aes(y=pos, label=total), size=3,show.legend=FALSE)+
+               aes(y=pos, label=paste0(total,"%")), size=3,show.legend=FALSE)+
     xlim(c(2,4))+
     ylab(NULL)+
     theme_grey()+
