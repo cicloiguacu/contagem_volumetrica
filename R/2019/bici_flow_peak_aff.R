@@ -19,7 +19,7 @@ dtcen <- dtcen[,c("Período:.manhã","vc_total","cm_total","can_total","ci_total",
 
 tempo <- stringr::str_split_fixed(dtcen$`Período:.manhã`,"-",2)[,1] %>% 
   as.ITime() %>% as.POSIXct() %>% format("%H:%M")
-nomes <- c("Via Calma","Contra-mão","Canaleta","Ciclovia")
+nomes <- c("Via Tráfego \n Geral","Contra-mão","Canaleta","Ciclovia")
 dtcen1 <- data.table("time" = rep(tempo,4),
                      "periodo" = rep(rep(c("Manhã","Tarde"),each=12),4),
                      "local" = rep(nomes,each=nrow(dtcen)),

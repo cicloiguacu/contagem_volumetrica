@@ -4,7 +4,7 @@ library(openxlsx)
 library(ggplot2)
 library(gridExtra)
 sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
-for(i in c(3,5,11,13,15)){ #)
+for(i in c(11,15)){ #)
   # centro
   dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[i],startRow=8)
   dtcen[is.na(dtcen)] <- 0
@@ -18,7 +18,8 @@ for(i in c(3,5,11,13,15)){ #)
   
   tempo <- stringr::str_split_fixed(dtcen$`Período:.manhã`,"-",2)[,1] %>% 
     as.ITime() %>% as.POSIXct() %>% format("%H:%M")
-  nomes <- c("Via Calma","Contra-mão","Canaleta")
+  #nomes <- c("Via Calma","Contra-mão","Canaleta")
+  nomes <- c("Via Tráfego \n Geral","Contra-mão","Canaleta")
   dtcen1 <- data.table("time" = rep(tempo,3),
                        "periodo" = rep(rep(c("Manhã","Tarde"),each=12),3),
                        "local" = rep(nomes,each=nrow(dtcen)),
@@ -96,7 +97,7 @@ for(i in c(3,5,11,13,15)){ #)
     labs(fill="Local de \n circulação")
   # multiplot
   pf <- grid.arrange(hour,pie,ncol=2)
-  ggsave(filename =paste0("graphics/bici_flow_peak/",sname[i],".jpg"),plot = pf,
+  ggsave(filename =paste0("graphics/bici_pico/",sname[i],".jpg"),plot = pf,
          width = 35,height = 15,units = "cm",dpi = "print")
   print(sname[i])
   
