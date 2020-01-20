@@ -10,13 +10,14 @@ Organizacao do repositorio:
 - `R/2019/`: codigos utilizados para plotar os graficos por ano
 - `produtos/`: relatorio finais de contagem volumetrica
 - **graphics/**
-- `total-flow_6to22/`: fluxo por *veículos* para pontos de contagem das 6-22h
-- `total-flow_peak/`: fluxo por *veículos* para pontos de contagem apenas nos horários de pico
-- `bici_flow_6to22/`: fluxo de *bicicletas* para pontos de contagem das 6-22h
-- `bici_flow_peak/`: fluxo por *bicicletas* para pontos de contagem apenas nos horários de pico
-- `gender_flow_peak/`: fluxo por *bicicletas* por **genero** para pontos de contagem apenas nos horários de pico
-- `gender_flow_6to22/`: fluxo por *bicicletas* por **genero** para pontos de contagem das 6-22h
+- `total_6to22/`: fluxo por *veículos* para pontos de contagem das 6-22h
+- `total_-flow_peak_pico/`: fluxo por *veículos* para pontos de contagem apenas nos horários de pico
+- `bici_6to22/`: fluxo de *bicicletas* para pontos de contagem das 6-22h
+- `bici_pico/`: fluxo por *bicicletas* para pontos de contagem apenas nos horários de pico
+- `gender_pcio/`: fluxo por *bicicletas* por **genero** para pontos de contagem apenas nos horários de pico
+- `gender_6to22/`: fluxo por *bicicletas* por **genero** para pontos de contagem das 6-22h
 - `affonso_camargo/`: todos os gráficos para o local Affonso Camargo
+- `historico`: graficos historicos na Av. Sete de Setembro e Republica Argentina
 
 
 
