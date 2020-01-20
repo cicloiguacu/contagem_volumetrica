@@ -11,7 +11,7 @@ Organizacao do repositorio:
 - `produtos/`: relatorio finais de contagem volumetrica
 - **graphics/**
 - `total_6to22/`: fluxo por *veículos* para pontos de contagem das 6-22h
-- `total_-flow_peak_pico/`: fluxo por *veículos* para pontos de contagem apenas nos horários de pico
+- `total_pico/`: fluxo por *veículos* para pontos de contagem apenas nos horários de pico
 - `bici_6to22/`: fluxo de *bicicletas* para pontos de contagem das 6-22h
 - `bici_pico/`: fluxo por *bicicletas* para pontos de contagem apenas nos horários de pico
 - `gender_pcio/`: fluxo por *bicicletas* por **genero** para pontos de contagem apenas nos horários de pico
