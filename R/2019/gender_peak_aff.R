@@ -26,6 +26,8 @@ dtcen1 <- data.table::data.table("time" = rep(tempo,4*2),
                                  "total" = c(dtcen$vc_masc,dtcen$cm_masc,dtcen$can_masc,dtcen$ci_masc,
                                              dtcen$vc_fem,dtcen$cm_fem,dtcen$can_fem,dtcen$ci_fem),
                                  "way" = "Centro e Bairro")
+
+dtcen1[,total:= 100 * total,]
 # centro
 dtbai <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[10],startRow=8)
 dtbai[is.na(dtbai)] <- 0

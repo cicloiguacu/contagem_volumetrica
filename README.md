@@ -9,6 +9,7 @@ Organizacao do repositorio:
 - `data_raw/2019/`: dados tratados para serem lidos pelos scripts de plot
 - `R/2019/`: codigos utilizados para plotar os graficos por ano
 - `produtos/`: relatorio finais de contagem volumetrica
+
 - **graphics/**
 - `total_6to22/`: fluxo por *veículos* para pontos de contagem das 6-22h
 - `total_pico/`: fluxo por *veículos* para pontos de contagem apenas nos horários de pico
