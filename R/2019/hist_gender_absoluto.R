@@ -28,11 +28,11 @@ p1 <- ggplot(sete1,
        aes(x = Ano,y = Total,fill = Local)) +
   geom_col(position = "dodge") +
   xlab(NULL)+
-  #ylim(c(0,1.05 * max(sete1$Total)))+
+  ylim(c(0,1.05 * max(sete1$Total)))+
   facet_grid(rows = vars(Gender),col = vars(Absoluto),scales = "free")+
   geom_text(data = sete1,
             aes(x= Ano, y= Total,label= Total),
-            position=position_dodge(width=0.9), vjust=+1.75,
+            position=position_dodge(width=0.9), vjust=-0.75,
             colour = "black",size = 4) +
   scale_x_continuous(breaks = c(2014:2019),
                      labels = c(2014:2019)) +
@@ -43,11 +43,11 @@ p2 <- ggplot(sete2,
              aes(x = Ano,y = Total,fill = Local)) +
   geom_col(position = "dodge") +
   xlab(NULL)+
-  #ylim(c(0,1.05 * max(sete1$Total)))+
-  facet_grid(rows = vars(Gender),col = vars(Absoluto),scales = "free")+
+  ylim(c(0,1.05 * max(sete2$Total)))+
+  facet_grid(rows = vars(Gender),col = vars(Absoluto))+
   geom_text(data = sete2,
             aes(x= Ano, y= Total,label= paste0(round(Total,1),"%")),
-            position=position_dodge(width=0.9), vjust=+1.75,
+            position=position_dodge(width=0.9), vjust=-0.75,
             colour = "black",size = 3.5) +
   scale_x_continuous(breaks = c(2014:2019),
                      labels = c(2014:2019)) +
@@ -57,5 +57,6 @@ p2 <- ggplot(sete2,
 
 pf <- grid.arrange(p1,p2,ncol=2)
 
-ggsave(pf,filename =paste0("graphics/historico/gender_abs-rel_sete.jpg"), scale = 1.2,
+ggsave(pf,filename =paste0("graphics/historico/gender_abs-rel_sete1.jpg"), scale = 1.2,
        width = 35,height = 15,units = "cm",dpi = "print")
+
