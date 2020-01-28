@@ -23,11 +23,13 @@ dtcen <- dtcen[,c("periodo","vc_total","cm_total","can_total","cal_total","BICI"
 
 tempo <- stringr::str_split_fixed(dtcen$periodo,"-",2)[,1] %>% 
   as.ITime() %>% as.POSIXct() %>% format("%H:%M")
-nomes <- c("Via Tráfego \n Geral","Contra-mão","Canaleta","Calçada")
+# nomes <- c("Via Tráfego \n Geral","Contra-mão","Canaleta","Calçada")
+nomes <- c("Canaleta","Calçada","Contra-mão","Via Tráfego \n Geral")
 dtcen1 <- data.table("time" = rep(tempo,4),
                      "periodo" = rep(rep(c("Manhã","Tarde"),each=12),4),
                      "local" = rep(nomes,each=nrow(dtcen)),
-                     "total" = c(dtcen$vc_total,dtcen$cm_total,dtcen$can_total,dtcen$cal_total),
+                     #"total" = c(dtcen$vc_total,dtcen$cm_total,dtcen$can_total,dtcen$cal_total),
+                     "total" =  c(dtcen$can_total,dtcen$cal_total,dtcen$cm_total,dtcen$vc_total),
                      "way" = "Centro")
 
 #  bairro
@@ -47,11 +49,12 @@ dtbai <- dtbai[,c("periodo","vc_total","cal_total","cm_total","can_total","BICI"
 
 tempo <- stringr::str_split_fixed(dtbai$periodo,"-",2)[,1] %>% 
   as.ITime() %>% as.POSIXct() %>% format("%H:%M")
-nomes <- c("Via Tráfego \n Geral","Calçada","Contra-mão","Canaleta")
+# nomes <- c("Via Tráfego \n Geral","Calçada","Contra-mão","Canaleta")
+nomes <- c("Canaleta","Calçada","Contra-mão","Via Tráfego \n Geral")
 dtbai1 <- data.table("time" = rep(tempo,4),
                      "periodo" = rep(rep(c("Manhã","Tarde"),each=12),4),
                      "local" = rep(nomes,each=nrow(dtbai)),
-                     "total" = c(dtbai$vc_total,dtbai$cal_total,dtbai$cm_total,dtbai$can_total),
+                     "total" = c(dtbai$can_total,dtbai$cal_total,dtbai$cm_total,dtbai$vc_total),
                      "way" = "Bairro")
 # ggplot hour
 dthour <- rbind(dtcen1,dtbai1)
@@ -67,6 +70,7 @@ hour <- ggplot(dthour,aes(x=time,y=total,fill=local))+
   xlab(NULL)+ylab("Número de bicicletas")+
   facet_grid(rows = vars(way),cols = vars(periodo),scales = "free")
 hour
+break()
 # --
 # PIE
 # --
@@ -112,6 +116,6 @@ pie
 pf <- grid.arrange(hour,pie,ncol=2)
 ggsave(filename =paste0("graphics/mal_floriano/28.11 mal + sil (centro).jpg"),plot = pf,
        width = 35,height = 12.5,units = "cm",dpi = "print")
-print(sname[9])
+# print(sname[9])
 
 

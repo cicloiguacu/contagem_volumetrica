@@ -88,5 +88,7 @@ pie
 pf <- grid.arrange(hour,pie,ncol=2)
 ggsave(filename =paste0("graphics/mal_floriano/flow_28.11 mal + sil (centro).jpg"),plot = pf,
        width = 35,height = 12.5,units = "cm",dpi = "print")
+ggsave(filename =paste0("graphics/mal_floriano/pie1_flow_28.11 mal + sil (centro).jpg"),plot = pie,
+       width = 15.5,height = 15.5,scale = 0.65,units = "cm",dpi = "print")
 #print(sname[9])
 

@@ -10,6 +10,7 @@ sete <- openxlsx::read.xlsx("data/2018/rep_argentina.xlsx", sheet = 3)
 sete <- setDT(sete)
 
 sete[Ano %in% 2016, Ano:= 2017]
+sete[,local := "Av. República Argentina x Av. Getúlio Vargas"]
 # sete[Local %in% "Via Lenta",lab := Total/2]
 # a <- sete2[Local %in% "Via Lenta",][,lab := Total/2][,Total]
 # sete2[Local %in% "Canaleta",lab:= Total/2 + a]
@@ -23,7 +24,7 @@ ggplot(sete,
   geom_bar(stat = "identity") +
   xlab(NULL)+
   #ylim(c(0,1.05 * max(sete1$Total)))+
-  facet_grid(rows = vars(Veiculo),scales = "free")+
+  facet_grid(rows = vars(Veiculo),cols = vars(local),scales = "free")+
   geom_text(data = sete,
             aes(x = Ano, y = Total,label= Total),
             vjust = 1.5,colour = "grey8",size = 3) +
