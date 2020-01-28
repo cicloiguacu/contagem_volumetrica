@@ -8,36 +8,46 @@ library(dplyr)
 sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
 
 
+# ---
 # centro
-dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[9],startRow=8)
+# ------
+dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[7],startRow=8)
 dtcen[is.na(dtcen)] <- 0
 dtcen <- setDT(dtcen)[,1:13]
 #dtcen <- rbind(dtcen,data.table(c("total",colSums(dtcen[,2:11])))
-
+dtcen$cal_masc <- 0
+dtcen$cal_fem <- 0
 #dtcen <- dtcen[,c("Período:.manhã","vc_total","cm_total","can_total","BICI")]
 
 tempo <- stringr::str_split_fixed(dtcen$`Período:.manhã`,"-",2)[,1] %>% 
   data.table::as.ITime() %>% as.POSIXct() %>% format("%H:%M")
-nomes <- c("Via de Tráfego \n geral","Contra-mão","Canaleta","Ciclovia")
+nomes <- c("Via de Tráfego \n geral","Contra-mão","Canaleta","Calçada")
 dtcen1 <- data.table::data.table("time" = rep(tempo,4*2),
                                  "periodo" = rep(rep(c("Manhã","Tarde"),each=12),4*2),
                                  "local" = rep(rep(nomes,each=24),2),
                                  "gender" = rep(c("Masculino","Feminino"),each=24*4),
-                                 "total" = c(dtcen$vc_masc,dtcen$cm_masc,dtcen$can_masc,dtcen$ci_masc,
-                                             dtcen$vc_fem,dtcen$cm_fem,dtcen$can_fem,dtcen$ci_fem),
+                                 "total" = c(dtcen$vc_masc,dtcen$cm_masc,dtcen$can_masc,dtcen$cal_masc,
+                                             dtcen$vc_fem,dtcen$cm_fem,dtcen$can_fem,dtcen$cal_fem),
                                  "way" = "Centro e Bairro")
 
-dtcen1[,total:= 100 * total,]
+dtcen1
+# dtcen1[,total:= 100 * total / sum(total),]
 # centro
-dtbai <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[10],startRow=8)
+dtbai <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[8],startRow=8)
 dtbai[is.na(dtbai)] <- 0
-dtbai <- setDT(dtbai)[,1:13]
+dtbai <- setDT(dtbai)[,1:11]
+dtbai_aux <- dtbai
+dtbai_aux[,2:11] <- 0;dtbai_aux$`Período:.tarde` <- dtcen$`Período:.manhã`[1:12]
+dtbai <- rbind(dtbai_aux,dtbai)
+  
+dtbai$vc_masc <- 0
+dtbai$vc_fem <- 0
 
-dtbai1 <- c(dtbai$vc_masc,dtbai$cm_masc,dtbai$can_masc,dtbai$ci_masc,
-            dtbai$vc_fem,dtbai$cm_fem,dtbai$can_fem,dtbai$ci_fem)
+dtbai1 <- c(dtbai$vc_masc,dtbai$cm_masc,dtbai$can_masc,dtbai$cal_masc,
+            dtbai$vc_fem,dtbai$cm_fem,dtbai$can_fem,dtbai$cal_fem)
 # soma
 # --
-dtcen1$total <- dtcen1$total+dtbai1
+dtcen1$total <- dtcen1$total+dtbai1 
 # ggplot hour
 dthour <- dtcen1
 aux <- dthour[,unique:=paste0(time,"_",periodo,"_",gender)][,sum_unique:= sum(total),by=unique][,.SD[1],by=unique]
@@ -50,6 +60,7 @@ hour <- ggplot(dthour,aes(x=time,y = total,fill=local))+
   labs(fill="Local de \n circulação")+
   xlab(NULL)+ylab("Número de bicicletas")+
   facet_grid(rows = vars(gender),cols = vars(periodo),scales = "free_x")
+hour
 # --
 # PIE
 # --
@@ -88,7 +99,7 @@ pie <- ggplot(dtpie,aes(ymax= ymax, ymin=ymin, xmax=4, xmin=3,fill=local))+
   labs(fill="Local de \n circulação")
 # multiplot
 pf <- grid.arrange(hour,pie,ncol=2)
-ggsave(filename =paste0("graphics/affonso_camargo/gender_",sname[9],".jpg"),plot = pf,
+ggsave(filename =paste0("graphics/mal_floriano/gender_",sname[7],".jpg"),plot = pf,
        width = 35,height = 12.5,units = "cm",dpi = "print")
 print(sname[i])
 
