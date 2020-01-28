@@ -5,21 +5,19 @@ library(ggplot2)
 library(gridExtra)
 library(data.table)
 library(dplyr)
-sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
+# sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
 
 
 # ---
 # centro
 # ------
-dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[7],startRow=8)
+dtcen <- readODS::read_ods("data/2019/mal_floriano.ods",sheet = "Centro", col_names = TRUE)
 dtcen[is.na(dtcen)] <- 0
-dtcen <- setDT(dtcen)[,1:13]
-#dtcen <- rbind(dtcen,data.table(c("total",colSums(dtcen[,2:11])))
-dtcen$cal_masc <- 0
-dtcen$cal_fem <- 0
-#dtcen <- dtcen[,c("Período:.manhã","vc_total","cm_total","can_total","BICI")]
+dtcen$periodo <- dtcen[,1]
+dtcen <- setDT(dtcen)
+#dtcen[,BICI := vc_total + cm_total + can_total]
 
-tempo <- stringr::str_split_fixed(dtcen$`Período:.manhã`,"-",2)[,1] %>% 
+tempo <- stringr::str_split_fixed(dtcen$periodo,"-",2)[,1] %>% 
   data.table::as.ITime() %>% as.POSIXct() %>% format("%H:%M")
 nomes <- c("Via de Tráfego \n geral","Contra-mão","Canaleta","Calçada")
 dtcen1 <- data.table::data.table("time" = rep(tempo,4*2),
@@ -32,16 +30,16 @@ dtcen1 <- data.table::data.table("time" = rep(tempo,4*2),
 
 dtcen1
 # dtcen1[,total:= 100 * total / sum(total),]
-# centro
-dtbai <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[8],startRow=8)
+# ---
+# Bairro
+# ------
+dtbai <- readODS::read_ods("data/2019/mal_floriano.ods",sheet = "Bairro", col_names = TRUE)
 dtbai[is.na(dtbai)] <- 0
-dtbai <- setDT(dtbai)[,1:11]
-dtbai_aux <- dtbai
-dtbai_aux[,2:11] <- 0;dtbai_aux$`Período:.tarde` <- dtcen$`Período:.manhã`[1:12]
-dtbai <- rbind(dtbai_aux,dtbai)
-  
-dtbai$vc_masc <- 0
-dtbai$vc_fem <- 0
+dtbai$periodo <- dtbai[,1]
+dtbai <- setDT(dtbai)
+
+#dtbai$vc_masc <- 0
+#dtbai$vc_fem <- 0
 
 dtbai1 <- c(dtbai$vc_masc,dtbai$cm_masc,dtbai$can_masc,dtbai$cal_masc,
             dtbai$vc_fem,dtbai$cm_fem,dtbai$can_fem,dtbai$cal_fem)
@@ -99,8 +97,8 @@ pie <- ggplot(dtpie,aes(ymax= ymax, ymin=ymin, xmax=4, xmin=3,fill=local))+
   labs(fill="Local de \n circulação")
 # multiplot
 pf <- grid.arrange(hour,pie,ncol=2)
-ggsave(filename =paste0("graphics/mal_floriano/gender_",sname[7],".jpg"),plot = pf,
+ggsave(filename =paste0("graphics/mal_floriano/gender_28.11 mal + sil (centro).jpg"),plot = pf,
        width = 35,height = 12.5,units = "cm",dpi = "print")
-print(sname[i])
+
 
 

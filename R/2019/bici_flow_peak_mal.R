@@ -5,21 +5,23 @@ library(ggplot2)
 library(dplyr)
 library(gridExtra)
 library(data.table)
-sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
+#sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
 
 # centro
-dtcen <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[7],startRow=8)
+dtcen <- readODS::read_ods("data/2019/mal_floriano.ods",sheet = "Centro", col_names = TRUE)
 dtcen[is.na(dtcen)] <- 0
-dtcen <- setDT(dtcen)[,1:13]
+dtcen$periodo <- dtcen[,1]
+dtcen <- setDT(dtcen)
+#dtcen <- setDT(dtcen)[,1:13]
 #dtcen <- rbind(dtcen,data.table(c("total",colSums(dtcen[,2:11])))
 dtcen[,vc_total := vc_masc + vc_fem + vc_nid]
 dtcen[,cm_total := cm_masc + cm_fem + cm_nid]
 dtcen[,can_total := can_masc + can_fem + can_nid]
-dtcen[,cal_total := 0]
+dtcen[,cal_total := cal_masc + cal_fem + cal_nid]
 dtcen[,BICI := vc_total + cm_total + can_total]
-dtcen <- dtcen[,c("Período:.manhã","vc_total","cm_total","can_total","cal_total","BICI")]
+dtcen <- dtcen[,c("periodo","vc_total","cm_total","can_total","cal_total","BICI")]
 
-tempo <- stringr::str_split_fixed(dtcen$`Período:.manhã`,"-",2)[,1] %>% 
+tempo <- stringr::str_split_fixed(dtcen$periodo,"-",2)[,1] %>% 
   as.ITime() %>% as.POSIXct() %>% format("%H:%M")
 nomes <- c("Via Tráfego \n Geral","Contra-mão","Canaleta","Calçada")
 dtcen1 <- data.table("time" = rep(tempo,4),
@@ -29,24 +31,25 @@ dtcen1 <- data.table("time" = rep(tempo,4),
                      "way" = "Centro")
 
 #  bairro
-dtbai <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[8],startRow=8)
+dtbai <- readODS::read_ods("data/2019/mal_floriano.ods",sheet = "Bairro", col_names = TRUE)
 dtbai[is.na(dtbai)] <- 0
+dtbai$periodo <- dtbai[,1]
 #dtbai <- setDT(dtbai)[,1:13]
 dtbai <- setDT(dtbai)
 #dtbai <- rbind(dtbai,data.table(c("total",colSums(dtbai[,2:11])))
 #dtbai[,vc_total := vc_masc + vc_fem + vc_nid]
 dtbai[,cal_total := cal_masc + cal_fem + cal_nid]
 dtbai[,cm_total := cm_masc + cm_fem + cm_nid]
-dtbai[,can_total := can_masc + can_fem + can_bid]
-dtbai[,vc_total := 0]
-dtbai[,BICI := cal_total + cm_total + can_total]
-dtbai <- dtbai[,c("Período:.tarde","vc_total","cal_total","cm_total","can_total","BICI")]
+dtbai[,can_total := can_masc + can_fem + can_nid]
+dtbai[,vc_total := vc_masc + vc_fem + vc_nid]
+dtbai[,BICI := cal_total + cm_total + can_total + vc_total]
+dtbai <- dtbai[,c("periodo","vc_total","cal_total","cm_total","can_total","BICI")]
 
-tempo <- stringr::str_split_fixed(dtbai$`Período:.tarde`,"-",2)[,1] %>% 
+tempo <- stringr::str_split_fixed(dtbai$periodo,"-",2)[,1] %>% 
   as.ITime() %>% as.POSIXct() %>% format("%H:%M")
 nomes <- c("Via Tráfego \n Geral","Calçada","Contra-mão","Canaleta")
 dtbai1 <- data.table("time" = rep(tempo,4),
-                     "periodo" = rep(rep(c("Tarde"),each=12),4),
+                     "periodo" = rep(rep(c("Manhã","Tarde"),each=12),4),
                      "local" = rep(nomes,each=nrow(dtbai)),
                      "total" = c(dtbai$vc_total,dtbai$cal_total,dtbai$cm_total,dtbai$can_total),
                      "way" = "Bairro")
@@ -107,8 +110,8 @@ pie <- ggplot(dtpie,aes(ymax= ymax, ymin=ymin, xmax=4, xmin=3,fill=local))+
 pie
 # multiplot
 pf <- grid.arrange(hour,pie,ncol=2)
-ggsave(filename =paste0("graphics/mal_floriano/",sname[7],".jpg"),plot = pf,
-       width = 35,height = 7.5,units = "cm",dpi = "print")
+ggsave(filename =paste0("graphics/mal_floriano/28.11 mal + sil (centro).jpg"),plot = pf,
+       width = 35,height = 12.5,units = "cm",dpi = "print")
 print(sname[9])
 
 

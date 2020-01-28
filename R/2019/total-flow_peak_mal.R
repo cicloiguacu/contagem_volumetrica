@@ -2,34 +2,38 @@
 rm(list=ls())
 library(openxlsx)
 library(ggplot2)
+library(readODS)
+library(dplyr)
 library(gridExtra)
-sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
+library(data.table)
+#sname <- openxlsx::getSheetNames("data/2019/contagens2019.xlsx")
 
 # centro
-dt <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[7],startRow=8)
+dt <- readODS::read_ods("data/2019/mal_floriano.ods",sheet = "Centro", col_names = TRUE)
 dt[is.na(dt)] <- 0
-dt$CAMINHAO_TOTAL <- dt$`CAMINHÃO.(2.EIXOS)`+dt$`CAMINHÃO.(+.2.EIXOS)`
-tempo <- stringr::str_split_fixed(dt$`Período:.manhã`,"-",2)[,1] %>% 
+dt$periodo <- dt[,1]
+dt$CAMINHAO_TOTAL <- dt$`CAMINHÃO (2 EIXOS)`+dt$`CAMINHÃO (2 EIXOS)`
+tempo <- stringr::str_split_fixed(dt$periodo,"-",2)[,1] %>% 
   as.ITime() %>% as.POSIXct() %>% format("%H:%M")
 nomes <- c("Bicicleta","Automóvel","Motocicleta","Ônibus","Caminhão","Outro")
 dtcen <- data.table("time" = rep(tempo,6),
                     "periodo" = rep(rep(c("Manhã","Tarde"),each=12),6),
                     "veh" = rep(nomes,each=nrow(dt)),
-                    "total" = c(dt$BICI,dt$AUTO,dt$MOTO,dt$ÔNIBUS,dt$CAMINHAO_TOTAL,dt$OUTRO),
+                    "total" = c(dt$BICI,dt$AUTOMÓVEL,dt$MOTO,dt$ÔNIBUS,dt$CAMINHAO_TOTAL,dt$OUTRO),
                     "way" = "Centro")
 
 # bairro
-# dt <- openxlsx::read.xlsx(xlsxFile = "data/2019/contagens2019.xlsx",sheet = sname[8],startRow=8)
-# dt[is.na(dt)] <- 0
+dt <- readODS::read_ods("data/2019/mal_floriano.ods",sheet = "Bairro", col_names = TRUE)
+dt[is.na(dt)] <- 0
 # dt$CAMINHAO_TOTAL <- dt$`CAMINHÃO.(2.EIXOS)`+dt$`CAMINHÃO.(+.2.EIXOS)`
-# nomes <- c("Bicicleta","Automóvel","Motocicleta","Ônibus","Caminhão","Outro")
-# dtbai <- data.table("time" = rep(tempo,6),
-#                     "periodo" = rep(rep(c("Manhã","Tarde"),each=12),6),
-#                     "veh" = rep(nomes,each=nrow(dt)),
-#                     "total" = c(dt$BICI,dt$AUTO,dt$MOTO,dt$ÔNIBUS,dt$CAMINHAO_TOTAL,dt$OUTRO),
-#                     "way" = "Ambos");rm(dt)
-# dthour <- rbind(dtcen,dtbai)
-dthour <- dtcen
+ nomes <- c("Bicicleta")
+dtbai <- data.table("time" = rep(tempo,1),
+                    "periodo" = rep(rep(c("Manhã","Tarde"),each=12),1),
+                    "veh" = rep(nomes,each=nrow(dt)),
+                    "total" = c(dt$BICI),
+                    "way" = "Bairro");rm(dt)
+ dthour <- rbind(dtcen,dtbai)
+#dthour <- dtcen
 # ggplot hour
 #dthour1 <- as.data.table(dtcen)[way %in% "Centro",]
 #tempo1 <- tempo[1:12]
@@ -82,7 +86,7 @@ pie <- ggplot(dtpie,aes(ymax= ymax, ymin=ymin, xmax=4, xmin=3,fill=veh))+
 pie
 # multiplot
 pf <- grid.arrange(hour,pie,ncol=2)
-ggsave(filename =paste0("graphics/mal_floriano/flow_",sname[7],".jpg"),plot = pf,
-       width = 35,height = 7.5,units = "cm",dpi = "print")
-print(sname[9])
+ggsave(filename =paste0("graphics/mal_floriano/flow_28.11 mal + sil (centro).jpg"),plot = pf,
+       width = 35,height = 12.5,units = "cm",dpi = "print")
+#print(sname[9])
 
